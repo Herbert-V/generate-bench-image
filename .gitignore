@@ -59,3 +59,9 @@ typings/
 
 # next.js build output
 .next
+
+# universal-ctags
+tags
+
+# Direnv file - same as .env
+.envrc
