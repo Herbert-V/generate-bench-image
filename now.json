@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "name": "generate-bench-img",
+  "env": {
+    "CLIENT_ID": "@client_id"
+  },
+  "build": {
+    "env": {
+      "CLIENT_ID": "@client_id"
+    }
+  },
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "static/**"
+    }
+  },
+  "redirects": [
+    {
+      "source": "/get-image",
+      "destination": "api/index.js"
+    }
+  ],
+  "github": {
+    "enabled": false
+  }
+}
