@@ -4,6 +4,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
+const port = process.env.PORT || 3000;
 
 const mergeImages = require("merge-images-v2");
 const Canvas = require("canvas");
@@ -39,10 +40,13 @@ const uploadImgAnonymously = base64Img => {
   return axios.post("https://api.imgur.com/3/upload", form, { headers });
 };
 
+app.get("/", (_, res) => {
+  res.send(JSON.stringify({ Hello: "World" }));
+});
+
 app.get("/get-image", async (req, res) => {
   const { days } = req.query || {};
   const shouldTransform = isNumber(days);
-  console.log("Getting days", days);
 
   if (shouldTransform) {
     try {
@@ -50,7 +54,6 @@ app.get("/get-image", async (req, res) => {
       const cords = CORDS_PER_DIGITS[digits] || DEFAULT_CORDS;
       const paddingConfig =
         PADDING_PER_DIGITS[digits] || DEFAULT_PADDING_CONFIG;
-      console.log("Creating img from text");
       const numberImg = text2png(days, {
         font: "50px Impact",
         color: "white",
@@ -62,8 +65,6 @@ app.get("/get-image", async (req, res) => {
         localFontName: "Impact",
         ...paddingConfig
       });
-      console.log("Finishing creating img from text");
-      console.log("Merging imgs");
       const imageFileData = await mergeImages(
         [
           { src: "static/base_2.png", x: 0, y: 0 },
@@ -73,17 +74,14 @@ app.get("/get-image", async (req, res) => {
           Canvas: Canvas
         }
       );
-      console.log("Finishing merging imgs");
       const result = imageFileData.replace(/^data:image\/png;base64,/, "");
 
-      console.log("Uploading to imgur");
       const response = await uploadImgAnonymously(result);
       const {
         data: {
           data: { link }
         }
       } = response;
-      console.log("Finishing uploading to imgur");
 
       res.status(200).send(link);
 
@@ -98,6 +96,6 @@ app.get("/get-image", async (req, res) => {
   res.status(404).send("The days param sent should be a number");
 });
 
-app.listen(3000, () => {
-  console.log("Listening in port 3000");
+app.listen(port, () => {
+  console.log(`Listening in port ${port}`);
 });
